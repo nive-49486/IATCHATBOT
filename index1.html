@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IAT Networks Chatbot</title>
+
+<style>
+
+/* BACKGROUND */
+body{
+margin:0;
+font-family:Arial,sans-serif;
+height:100vh;
+overflow:hidden;
+
+/* DARK BLUE ANIMATED GRADIENT */
+background:linear-gradient(
+-45deg,
+#0f172a,
+#1e293b,
+#1d4ed8,
+#2563eb
+);
+
+background-size:400% 400%;
+animation:bgMove 12s ease infinite;
+position:relative;
+}
+
+/* BACKGROUND ANIMATION */
+@keyframes bgMove{
+
+0%{
+background-position:0% 50%;
+}
+
+50%{
+background-position:100% 50%;
+}
+
+100%{
+background-position:0% 50%;
+}
+
+}
+
+/* GLOW EFFECT */
+body::before{
+content:"";
+position:absolute;
+width:320px;
+height:320px;
+background:rgba(255,255,255,0.08);
+border-radius:50%;
+top:-100px;
+left:-100px;
+filter:blur(50px);
+animation:float1 8s ease-in-out infinite;
+}
+
+body::after{
+content:"";
+position:absolute;
+width:260px;
+height:260px;
+background:rgba(255,255,255,0.06);
+border-radius:50%;
+bottom:-80px;
+right:-80px;
+filter:blur(50px);
+animation:float2 10s ease-in-out infinite;
+}
+
+/* FLOAT EFFECT */
+@keyframes float1{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(35px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
+}
+
+@keyframes float2{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(-35px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
+}
+
+/* BRAND */
+.brand{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+color:white;
+z-index:10;
+width:100%;
+}
+
+/* TITLE */
+.brand h1{
+font-size:34px;
+}
+.brand{
+padding:0 20px;
+}
+
+/* SUBTITLE */
+.brand p{
+margin-top:10px;
+font-size:16px;
+color:#e2e8f0;
+letter-spacing:1px;
+}
+
+/* CHAT BUTTON */
+.chat-btn{
+position:fixed;
+bottom:20px;
+right:20px;
+width:65px;
+height:65px;
+border-radius:50%;
+background:white;
+color:#2563eb;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+cursor:pointer;
+box-shadow:0 5px 18px rgba(0,0,0,0.3);
+z-index:999;
+transition:0.3s;
+}
+
+.chat-btn:hover{
+transform:scale(1.08);
+}
+
+/* CHATBOX */
+.chatbox{
+position:fixed;
+bottom:95px;
+right:20px;
+width:340px;
+height:520px;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(18px);
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.25);
+display:none;
+flex-direction:column;
+overflow:hidden;
+z-index:999;
+}
+
+/* SHOW */
+.chatbox.show{
+display:flex;
+}
+
+/* HEADER */
+.header{
+padding:15px;
+background:rgba(255,255,255,0.2);
+color:white;
+font-size:17px;
+font-weight:bold;
+}
+
+/* QUICK BUTTONS */
+.quick{
+padding:10px;
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+}
+
+.quick button{
+border:none;
+padding:8px 12px;
+border-radius:20px;
+background:white;
+cursor:pointer;
+font-size:12px;
+transition:0.2s;
+}
+
+.quick button:hover{
+background:#2563eb;
+color:white;
+}
+
+/* CHAT AREA */
+.chat-area{
+flex:1;
+padding:12px;
+overflow-y:auto;
+}
+
+/* MESSAGE */
+.message{
+padding:10px 14px;
+margin:8px 0;
+border-radius:14px;
+max-width:80%;
+font-size:14px;
+line-height:1.5;
+animation:fade 0.3s ease;
+}
+
+@keyframes fade{
+
+from{
+opacity:0;
+transform:translateY(5px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+.bot{
+background:white;
+color:#222;
+}
+
+.user{
+background:#2563eb;
+color:white;
+margin-left:auto;
+}
+
+/* INPUT AREA */
+.input-box{
+display:flex;
+padding:10px;
+background:rgba(255,255,255,0.15);
+}
+
+.input-box input{
+flex:1;
+padding:11px;
+border:none;
+border-radius:10px;
+outline:none;
+font-size:14px;
+}
+
+.input-box button{
+margin-left:6px;
+padding:10px 14px;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:10px;
+cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+.brand h1{
+font-size:34px;
+}
+
+.chatbox{
+width:95%;
+height:90vh;
+right:2.5%;
+bottom:10px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BRAND -->
+<div class="brand">
+<h1>IAT Networks</h1>
+<p>Smart Support Assistant</p>
+</div>
+
+<!-- CHAT BUTTON -->
+<div class="chat-btn" onclick="toggleChat()">
+💬
+</div>
+
+<!-- CHATBOX -->
+<div class="chatbox" id="chatbox">
+
+<!-- HEADER -->
+<div class="header">
+IAT Assistant
+</div>
+
+<!-- QUICK BUTTONS -->
+<div class="quick">
+<button onclick="quickMsg('services')">Services</button>
+<button onclick="quickMsg('recruitment')">Recruitment</button>
+<button onclick="quickMsg('rpo')">RPO</button>
+<button onclick="quickMsg('contact')">Contact</button>
+</div>
+
+<!-- CHAT AREA -->
+<div class="chat-area" id="chatArea">
+
+<div class="message bot">
+👋 Hello! Welcome to IAT Networks. How can I help you?
+</div>
+
+</div>
+
+<!-- INPUT -->
+<div class="input-box">
+
+<input
+type="text"
+id="userInput"
+placeholder="Type message..."
+>
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* TOGGLE CHAT */
+function toggleChat(){
+
+document
+.getElementById("chatbox")
+.classList.toggle("show");
+
+}
+
+/* QUICK BUTTON */
+function quickMsg(text){
+
+document.getElementById("userInput").value=text;
+
+sendMessage();
+
+}
+
+/* BOT REPLY */
+function getReply(text){
+
+text=text.toLowerCase();
+
+/* SERVICES */
+if(text.includes("services"))
+return `
+IAT Networks provides:
+
+• Recruitment Services
+• Permanent Staffing
+• RPO Services
+• IT Support Solutions
+`;
+
+/* RECRUITMENT */
+if(text.includes("recruitment"))
+return `
+IAT Networks helps companies hire skilled candidates for different roles.
+`;
+
+/* RPO */
+if(text.includes("rpo"))
+return `
+RPO (Recruitment Process Outsourcing) means managing hiring processes through an external recruitment partner.
+`;
+
+/* CONTACT */
+if(text.includes("contact"))
+return `
+📩 Contact Details:
+
+Email: hr@iatnetworks.com
+Phone: +91 73588 34638
+Location: Vellore
+`;
+
+/* DEFAULT */
+return `
+I can help you with:
+
+• Services
+• Recruitment
+• RPO
+• Contact
+`;
+
+}
+
+/* SEND MESSAGE */
+function sendMessage(){
+
+let input=document.getElementById("userInput");
+
+let text=input.value;
+
+if(text.trim()==="") return;
+
+let chat=document.getElementById("chatArea");
+
+/* USER MESSAGE */
+chat.innerHTML += `
+<div class="message user">${text}</div>
+`;
+
+/* TYPING */
+chat.innerHTML += `
+<div class="message bot" id="typing">
+🤖 Typing...
+</div>
+`;
+
+chat.scrollTop=chat.scrollHeight;
+
+/* BOT REPLY */
+setTimeout(()=>{
+
+document.getElementById("typing").remove();
+
+let reply=getReply(text);
+
+chat.innerHTML += `
+<div class="message bot">${reply}</div>
+`;
+
+chat.scrollTop=chat.scrollHeight;
+
+},700);
+
+input.value="";
+
+}
+
+/* ENTER KEY */
+document
+.getElementById("userInput")
+.addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+sendMessage();
+}
+
+});
+
+</script>
+
+</body>
+</html>
